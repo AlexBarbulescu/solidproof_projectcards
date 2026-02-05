@@ -12,7 +12,8 @@ This writes `data/projects.json`.
 
 ## 2) Start the local server
 
-- `php -c config/php.ini -S 127.0.0.1:8000 -t public`
+- Windows (enables extensions via `config/php.ini`): `php -c config/php.ini -S 127.0.0.1:8000 -t public`
+- macOS/Linux (if your PHP already has GD enabled): `php -S 127.0.0.1:8000 -t public`
 
 Open:
 
@@ -40,7 +41,8 @@ Note: Cloudflare Pages build environments are not guaranteed to have PHP availab
 ### Build
 
 - Fetch data: `php scripts/fetch_projects.php`
-- Build static output: `php -c config/php.ini scripts/build_static_pages.php`
+- Windows (enables extensions via `config/php.ini`): `php -c config/php.ini scripts/build_static_pages.php`
+- macOS/Linux/CI: `php scripts/build_static_pages.php`
 
 This creates `dist/index.html` + the rendered images under `dist/cards/` and thumbnails under `dist/thumbs/`.
 
@@ -54,5 +56,13 @@ Optional flags:
 
 - Install Wrangler (once): `npm i -g wrangler`
 - Deploy: `wrangler pages deploy dist`
+
+### Common build pitfall
+
+If you paste a command into Cloudflare and it looks like `php -c [php.ini](...) ...`, that is not valid shell syntax (it happens when copying a linkified command from an editor). Replace it with plain text like:
+
+- `php scripts/build_static_pages.php --out=dist`
+
+Also note: `config/php.ini` is Windows-specific (it contains a Windows `extension_dir`) and should not be used on Linux/Cloudflare.
 
 ## QR Generator https://goqr.me/
