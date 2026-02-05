@@ -1,0 +1,41 @@
+# --- PHP / Composer ---
+/vendor/
+/composer.lock
+
+# --- Local runtime outputs ---
+/out/
+
+# Cached logos downloaded during preview/render
+/app/logos/
+
+# If you want to keep the folder but ignore contents, use a .gitkeep inside.
+
+# --- Local config / secrets ---
+.env
+.env.*
+
+# Local PHP ini overrides (keep project config/php.ini tracked)
+# (uncomment if you ever add local-only ini files)
+# /config/php.local.ini
+
+# --- Logs / caches ---
+*.log
+
+# --- OS / Editor ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+.vscode/
+.idea/
+
+# --- PHPUnit / Coverage (if added later) ---
+.phpunit.result.cache
+coverage/
+
+# --- Node (if added later) ---
+node_modules/
+
+# --- Misc ---
+*.tmp
+*.swp
