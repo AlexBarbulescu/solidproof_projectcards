@@ -4,7 +4,6 @@
 
 # --- Local runtime outputs ---
 /out/
-/dist/
 
 # Cached logos downloaded during preview/render
 /app/logos/
