@@ -10,6 +10,7 @@
     "build": "vite build",
     "build:page": "npm run build:pages",
     "build:pages": "node scripts/build-pages.mjs",
+    "deploy:worker": "node scripts/deploy-worker.mjs",
     "preview": "node server.js --prod",
     "preview:vite": "vite preview",
     "serve": "node server.js --prod",

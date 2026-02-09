@@ -7,6 +7,7 @@
   "main": "src/worker.js",
   "assets": {
     "directory": "./cf-pages",
+    "binding": "ASSETS",
     // IMPORTANT:
     // We implement SPA fallback in the Worker itself so dynamic routes like
     // `/certificate-intervention.php` are never rewritten to `/index.html`.
