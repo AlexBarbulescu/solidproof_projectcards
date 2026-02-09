@@ -1,0 +1,18 @@
+{
+  "name": "certificate-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js --dev",
+    "dev:solo": "node server.js --dev",
+    "dev:vite": "vite",
+    "build": "vite build",
+    "preview": "node server.js --prod",
+    "preview:vite": "vite preview",
+    "serve": "node server.js --prod"
+  },
+  "devDependencies": {
+    "vite": "^6.1.0"
+  }
+}

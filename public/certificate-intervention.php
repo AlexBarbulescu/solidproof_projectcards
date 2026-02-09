@@ -14,6 +14,9 @@ require $root . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload
 use Preview\CertificateController;
 
 function fail(string $message, int $status = 500): never {
+    if (PHP_SAPI === 'cli') {
+        throw new RuntimeException($message, $status);
+    }
     http_response_code($status);
     header('Content-Type: text/plain; charset=utf-8');
     echo $message;

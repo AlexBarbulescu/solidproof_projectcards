@@ -36,6 +36,10 @@ coverage/
 # --- Node (if added later) ---
 node_modules/
 
+# Vite
+frontend/.vite/
+public/dist/
+
 # --- Misc ---
 *.tmp
 *.swp
