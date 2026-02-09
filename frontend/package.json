@@ -8,9 +8,11 @@
     "dev:solo": "node server.js --dev",
     "dev:vite": "vite",
     "build": "vite build",
+    "build:pages": "node scripts/build-pages.mjs",
     "preview": "node server.js --prod",
     "preview:vite": "vite preview",
-    "serve": "node server.js --prod"
+    "serve": "node server.js --prod",
+    "serve:pages": "npx --yes serve ../cf-pages -l 4173"
   },
   "devDependencies": {
     "vite": "^6.1.0"

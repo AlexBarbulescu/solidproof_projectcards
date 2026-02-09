@@ -40,6 +40,9 @@ node_modules/
 frontend/.vite/
 public/dist/
 
+# Cloudflare Pages static output
+cf-pages/
+
 # --- Misc ---
 *.tmp
 *.swp

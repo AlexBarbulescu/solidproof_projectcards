@@ -1,5 +1,11 @@
 const $mount = document.querySelector('#app');
 
+// For static hosting (Cloudflare Pages), these can be configured at build time:
+// - VITE_PROJECTS_URL=/api/projects.json
+// - VITE_RENDER_URL=https://your-renderer.example.com
+const PROJECTS_URL = (import.meta?.env?.VITE_PROJECTS_URL) || '/api/projects.php';
+const RENDER_BASE_URL = (import.meta?.env?.VITE_RENDER_URL) || '';
+
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
   for (const [key, value] of Object.entries(props || {})) {
@@ -24,6 +30,22 @@ async function fetchJson(url) {
     throw new Error(`HTTP ${res.status} ${res.statusText}${text ? `: ${text}` : ''}`);
   }
   return res.json();
+}
+
+function joinBaseUrl(base, pathname) {
+  const b = String(base || '').trim();
+  if (!b) return pathname;
+
+  // If base is a full URL, use URL resolution.
+  try {
+    const u = new URL(b);
+    return new URL(pathname, u).toString();
+  } catch {
+    // Support base like "/api" or "https://example.com".
+    const left = b.endsWith('/') ? b.slice(0, -1) : b;
+    const right = pathname.startsWith('/') ? pathname : `/${pathname}`;
+    return `${left}${right}`;
+  }
 }
 
 function normalizeUrl(url) {
@@ -124,7 +146,8 @@ function socialLinks(p) {
 }
 
 function buildInterventionUrl({ project, type, logoScale }) {
-  const u = new URL('/certificate-intervention.php', window.location.origin);
+  const baseUrl = joinBaseUrl(RENDER_BASE_URL, '/certificate-intervention.php');
+  const u = new URL(baseUrl, window.location.origin);
   if (project) u.searchParams.set('project', project);
   if (type) u.searchParams.set('type', type);
   if (logoScale) u.searchParams.set('logoScale', logoScale);
@@ -590,8 +613,10 @@ let projectsPromise = null;
 async function getProjects() {
   if (cachedProjects) return cachedProjects;
   if (!projectsPromise) {
-    projectsPromise = fetchJson('/api/projects.php').then((payload) => {
-      const list = Array.isArray(payload?.data) ? payload.data : [];
+    projectsPromise = fetchJson(PROJECTS_URL).then((payload) => {
+      const list = Array.isArray(payload?.data)
+        ? payload.data
+        : (Array.isArray(payload) ? payload : []);
       cachedProjects = list;
       return list;
     });

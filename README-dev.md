@@ -78,6 +78,51 @@ Windows shortcut:
 
 Open `http://127.0.0.1:5173/` (dev) or `http://127.0.0.1:4173/` (prod-style).
 
+## Deploy to Cloudflare Pages
+
+Cloudflare Pages is **static hosting** (plus Worker-based Functions). It cannot run PHP/GD/Intervention, and it cannot spawn `php` via CLI.
+
+What you *can* do:
+
+- Host the Vite UI on Pages.
+- Host `projects.json` as a static file on Pages.
+- Point the UI at a separate render backend that serves `/certificate-intervention.php` (your existing PHP renderer) from somewhere else.
+
+### 1) Build the static site
+
+From `frontend/`:
+
+- `npm install`
+- `npm run build:pages`
+
+This produces a deployable folder at `cf-pages/` containing:
+
+- `index.html` + Vite assets
+- `/assets/style.css` copied from `public/assets/style.css`
+- `/img`, `/fonts`, `/certificates` copied from `public/`
+- `/api/projects.json` copied from `data/projects.json` (if present)
+- `_redirects` for SPA routing
+
+### 2) Cloudflare Pages settings
+
+In Cloudflare Pages:
+
+- Framework preset: `Vite` (or `None`)
+- Build command: `cd frontend && npm ci && npm run build:pages`
+- Build output directory: `cf-pages`
+
+### 3) Configure API + renderer URLs
+
+In Cloudflare Pages → Settings → Environment variables, set:
+
+- `VITE_PROJECTS_URL` to `/api/projects.json` (static file deployed by `build:pages`)
+- `VITE_RENDER_URL` to your renderer origin, e.g. `https://renderer.example.com`
+
+Your renderer origin must provide the existing endpoint:
+
+- `GET /certificate-intervention.php?project=<slug>&type=audit_v4`
+- `GET /certificate-intervention.php?project=<slug>&type=kyc_v4`
+
 ## v4 image output
 
 The endpoint below renders a real JPEG using Intervention Image (GD driver):
