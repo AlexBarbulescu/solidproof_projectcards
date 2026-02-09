@@ -1,9 +1,13 @@
 const $mount = document.querySelector('#app');
 
-// For static hosting (Cloudflare Pages), these can be configured at build time:
+// For static hosting (Cloudflare Pages / Workers assets), these can be configured at build time:
 // - VITE_PROJECTS_URL=/api/projects.json
 // - VITE_RENDER_URL=https://your-renderer.example.com
-const PROJECTS_URL = (import.meta?.env?.VITE_PROJECTS_URL) || '/api/projects.php';
+// Defaults:
+// - Local (node/php): /api/projects.php
+// - Static deploy (mode=pages): /api/projects.json
+const DEFAULT_PROJECTS_URL = (import.meta?.env?.MODE === 'pages') ? '/api/projects.json' : '/api/projects.php';
+const PROJECTS_URL = (import.meta?.env?.VITE_PROJECTS_URL) || DEFAULT_PROJECTS_URL;
 const RENDER_BASE_URL = (import.meta?.env?.VITE_RENDER_URL) || '';
 
 function el(tag, props = {}, children = []) {
@@ -610,13 +614,36 @@ function renderPreview(projects, params) {
 let cachedProjects = null;
 let projectsPromise = null;
 
-async function getProjects() {
-  if (cachedProjects) return cachedProjects;
-  if (!projectsPromise) {
-    projectsPromise = fetchJson(PROJECTS_URL).then((payload) => {
+async function fetchProjectsWithFallback() {
+  const tried = [];
+  const candidates = [
+    PROJECTS_URL,
+    // Static deploy artifact written by build:pages
+    '/api/projects.json'
+  ].filter((v, i, a) => v && a.indexOf(v) === i);
+
+  let lastError = null;
+  for (const url of candidates) {
+    tried.push(url);
+    try {
+      const payload = await fetchJson(url);
       const list = Array.isArray(payload?.data)
         ? payload.data
         : (Array.isArray(payload) ? payload : []);
+      return list;
+    } catch (e) {
+      lastError = e;
+    }
+  }
+
+  const msg = String(lastError?.message || lastError || 'Unknown error');
+  throw new Error(`${msg}\n\nTried: ${tried.join(', ')}`);
+}
+
+async function getProjects() {
+  if (cachedProjects) return cachedProjects;
+  if (!projectsPromise) {
+    projectsPromise = fetchProjectsWithFallback().then((list) => {
       cachedProjects = list;
       return list;
     });
@@ -645,7 +672,7 @@ async function render() {
           el('div', { class: 'card-title', text: 'Setup' }),
           el('div', { class: 'card-body' }, [
             el('p', { text: String(e?.message || e) }),
-            el('p', { class: 'muted', text: 'Missing data/projects.json? Run: php scripts/fetch_projects.php' })
+            el('p', { class: 'muted', text: 'Local dev: run php scripts/fetch_projects.php. Static deploy: ensure /api/projects.json exists or set VITE_PROJECTS_URL.' })
           ])
         ])
       ])
