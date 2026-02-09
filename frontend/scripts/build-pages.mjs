@@ -38,9 +38,14 @@ async function main() {
 
   // 2) Copy shared static assets needed by the CSS
   const publicDir = path.resolve(repoRoot, 'public');
-  await copyDir(path.join(publicDir, 'img'), path.join(outDir, 'img'));
-  await copyDir(path.join(publicDir, 'fonts'), path.join(outDir, 'fonts'));
-  await copyDir(path.join(publicDir, 'certificates'), path.join(outDir, 'certificates'));
+  const imgDir = path.resolve(repoRoot, 'img');
+  const fontsDir = path.resolve(repoRoot, 'fonts');
+  const certificatesDir = path.resolve(repoRoot, 'certificates');
+
+  // Prefer repo-root asset folders (this project keeps images/fonts outside public/)
+  await copyDir(imgDir, path.join(outDir, 'img'));
+  await copyDir(fontsDir, path.join(outDir, 'fonts'));
+  await copyDir(certificatesDir, path.join(outDir, 'certificates'));
 
   // Keep CSS path parity: /assets/style.css
   await fs.mkdir(path.join(outDir, 'assets'), { recursive: true });

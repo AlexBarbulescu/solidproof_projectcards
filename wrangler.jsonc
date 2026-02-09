@@ -1,11 +1,16 @@
 {
   // Cloudflare Workers deployment (static assets only)
   // This lets `npx wrangler deploy` publish the static site built into `cf-pages/`.
-  // Note: This does NOT run PHP/GD rendering. Configure VITE_RENDER_URL to a separate backend.
+  // Note: This Worker also implements an SVG renderer at `/certificate-intervention.php` (no PHP/GD).
   "name": "spcard",
   "compatibility_date": "2026-02-09",
+  "main": "src/worker.js",
   "assets": {
     "directory": "./cf-pages",
-    "not_found_handling": "single-page-application"
+    // IMPORTANT:
+    // We implement SPA fallback in the Worker itself so dynamic routes like
+    // `/certificate-intervention.php` are never rewritten to `/index.html`.
+    // (The built-in SPA fallback can swallow unknown paths before the Worker runs.)
+    "not_found_handling": "none"
   }
 }
