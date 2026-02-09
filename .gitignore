@@ -46,3 +46,6 @@ cf-pages/
 # --- Misc ---
 *.tmp
 *.swp
+
+# Wrangler
+.wrangler/

@@ -1,0 +1,10 @@
+{
+  // Cloudflare Workers deployment (static assets only)
+  // This lets `npx wrangler deploy` publish the static site built into `cf-pages/`.
+  // Note: This does NOT run PHP/GD rendering. Configure VITE_RENDER_URL to a separate backend.
+  "name": "spcard",
+  "compatibility_date": "2026-02-09",
+  "assets": {
+    "directory": "./cf-pages"
+  }
+}
