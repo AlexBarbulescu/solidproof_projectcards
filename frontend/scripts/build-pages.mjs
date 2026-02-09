@@ -57,9 +57,17 @@ async function main() {
     await fs.copyFile(projectsSrc, path.join(outDir, 'api', 'projects.json'));
   }
 
-  // 4) SPA fallback for Cloudflare Pages
-  const redirects = '/* /index.html 200\n';
-  await fs.writeFile(path.join(outDir, '_redirects'), redirects, 'utf8');
+  // 4) SPA fallback
+  // - For Cloudflare Pages, you can opt-in to writing `_redirects` by setting CF_PAGES_REDIRECTS=1.
+  // - For Wrangler/Workers static assets, prefer `assets.not_found_handling="single-page-application"` in wrangler.jsonc.
+  if (process.env.CF_PAGES_REDIRECTS === '1') {
+    const redirects = '/* /index.html 200\n';
+    await fs.writeFile(path.join(outDir, '_redirects'), redirects, 'utf8');
+  } else {
+    // Ensure we don't ship a stale redirects file.
+    const redirectsPath = path.join(outDir, '_redirects');
+    try { await fs.unlink(redirectsPath); } catch { /* ignore */ }
+  }
 }
 
 main().catch((e) => {

@@ -101,7 +101,9 @@ This produces a deployable folder at `cf-pages/` containing:
 - `/assets/style.css` copied from `public/assets/style.css`
 - `/img`, `/fonts`, `/certificates` copied from `public/`
 - `/api/projects.json` copied from `data/projects.json` (if present)
-- `_redirects` for SPA routing
+- (optional) `_redirects` for SPA routing (Cloudflare Pages only)
+
+To generate `_redirects` during the build, set `CF_PAGES_REDIRECTS=1` in the build environment.
 
 ### 2) Cloudflare Pages settings
 

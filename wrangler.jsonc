@@ -5,6 +5,7 @@
   "name": "spcard",
   "compatibility_date": "2026-02-09",
   "assets": {
-    "directory": "./cf-pages"
+    "directory": "./cf-pages",
+    "not_found_handling": "single-page-application"
   }
 }
