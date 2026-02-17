@@ -26,29 +26,9 @@ function digitsOnly(value) {
   return m ? m.join('') : '';
 }
 
-function readCounter(filePath) {
-  try {
-    const raw = fs.readFileSync(filePath, 'utf8').trim();
-    const n = Number.parseInt(raw, 10);
-    return Number.isFinite(n) && n >= 0 ? n : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function writeCounter(filePath, value) {
-  try {
-    fs.writeFileSync(filePath, String(value), 'utf8');
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function getBuildNumber({ isBuild }) {
+function getBuildNumber() {
   // Prefer CI-provided numeric build/run identifiers.
   const candidates = [
-    process.env.VITE_BUILD_NUMBER,
     process.env.CF_PAGES_BUILD_ID,
     process.env.CF_PAGES_DEPLOYMENT_ID,
     process.env.GITHUB_RUN_NUMBER,
@@ -64,21 +44,14 @@ function getBuildNumber({ isBuild }) {
     if (d) return d;
   }
 
-  // Local fallback: persistent auto-incrementing build counter.
-  const counterFile = path.resolve(__dirname, '.build-number');
-  const current = readCounter(counterFile);
-
-  if (isBuild) {
-    const next = current + 1;
-    if (writeCounter(counterFile, next)) {
-      return String(next);
-    }
-
-    // Read-only filesystem fallback (some CI environments): use epoch seconds.
-    return String(Math.floor(Date.now() / 1000));
-  }
-
-  return String(current);
+  // Local fallback: timestamp-based build number (changes on every build).
+  const now = new Date();
+  const yyyy = String(now.getUTCFullYear());
+  const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(now.getUTCDate()).padStart(2, '0');
+  const hh = String(now.getUTCHours()).padStart(2, '0');
+  const mi = String(now.getUTCMinutes()).padStart(2, '0');
+  return `${yyyy}${mm}${dd}${hh}${mi}`;
 }
 
 function toFourPartVersion(baseVersion, buildNumber) {
@@ -96,7 +69,7 @@ export default defineConfig(({ command, mode }) => {
   const isBuild = command === 'build';
   const isPages = mode === 'pages' || process.env.CF_PAGES === '1';
   const appVersion = getAppVersion();
-  const buildNumber = getBuildNumber({ isBuild });
+  const buildNumber = getBuildNumber();
   const version4 = toFourPartVersion(appVersion, buildNumber);
 
   return {
