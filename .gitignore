@@ -38,6 +38,7 @@ node_modules/
 
 # Vite
 frontend/.vite/
+frontend/.build-number
 public/dist/
 
 # Cloudflare Pages static output
