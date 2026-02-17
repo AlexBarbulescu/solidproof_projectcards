@@ -163,18 +163,36 @@ function buildInterventionUrl({ project, type, logoScale }) {
   return u.toString();
 }
 
-function renderImageBlock({ label, imgAlt, imgSrc }) {
+function buildInterventionFallbackUrl({ project, type, logoScale }) {
+  const u = new URL('/certificate-intervention.php', window.location.origin);
+  if (project) u.searchParams.set('project', project);
+  if (type) u.searchParams.set('type', type);
+  if (logoScale) u.searchParams.set('logoScale', logoScale);
+  return u.toString();
+}
+
+function renderImageBlock({ label, imgAlt, imgSrc, imgFallbackSrc = '' }) {
   const help = el('p', {
     class: 'muted',
     style: 'margin: 8px 0 0 0; display:none;',
     text: 'Image failed to load. Open it in a new tab to see the response (SVG/JPEG) or an error text. If you deploy static-only without the Worker renderer, set VITE_RENDER_URL to a renderer backend and redeploy.'
   });
 
+  let triedFallback = false;
+
   const img = el('img', {
     class: 'img-preview',
     alt: imgAlt,
     src: imgSrc,
+    onLoad: () => {
+      help.style.display = 'none';
+    },
     onError: () => {
+      if (!triedFallback && imgFallbackSrc && img.src !== imgFallbackSrc) {
+        triedFallback = true;
+        img.src = imgFallbackSrc;
+        return;
+      }
       help.style.display = '';
     }
   });
@@ -546,6 +564,8 @@ function renderPreview(projects, params) {
 
   const auditUrl = buildInterventionUrl({ project: slug, type: 'audit_v4', logoScale });
   const kycUrl = buildInterventionUrl({ project: slug, type: 'kyc_v4', logoScale });
+  const auditFallbackUrl = buildInterventionFallbackUrl({ project: slug, type: 'audit_v4', logoScale });
+  const kycFallbackUrl = buildInterventionFallbackUrl({ project: slug, type: 'kyc_v4', logoScale });
 
   const root = el('div', { class: 'page' }, [
     el('header', { class: 'topbar' }, [
@@ -603,8 +623,8 @@ function renderPreview(projects, params) {
               ]),
 
               el('div', { style: 'display:flex; gap: 12px; align-items:flex-start; flex-wrap:wrap;' }, [
-                renderImageBlock({ label: 'Audit v4', imgAlt: 'Generated display card (audit_v4)', imgSrc: auditUrl }),
-                renderImageBlock({ label: 'KYC v4', imgAlt: 'Generated display card (kyc_v4)', imgSrc: kycUrl })
+                renderImageBlock({ label: 'Audit v4', imgAlt: 'Generated display card (audit_v4)', imgSrc: auditUrl, imgFallbackSrc: auditFallbackUrl }),
+                renderImageBlock({ label: 'KYC v4', imgAlt: 'Generated display card (kyc_v4)', imgSrc: kycUrl, imgFallbackSrc: kycFallbackUrl })
               ]),
 
               el('div', { class: 'card', style: 'margin-top: 12px; width: 100%;' }, [
