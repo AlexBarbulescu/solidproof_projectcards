@@ -415,7 +415,17 @@ function renderIndex(projects) {
 
   function isInteractiveTarget(target) {
     if (!target || typeof target.closest !== 'function') return false;
-    return !!target.closest('a,button,input,select,textarea,label,[role="button"],[role="link"],.fav-btn');
+    // Do NOT include [role="link"] here because each table row has role="link".
+    // Including it would make every click look "interactive" and block row navigation.
+    return !!target.closest('a,button,input,select,textarea,label,[role="button"],.fav-btn');
+  }
+
+  function eventTargetElement(e) {
+    const t = e?.target;
+    if (!t) return null;
+    // Some browsers (notably mobile Safari) can report a Text node as the target.
+    if (t.nodeType === 3) return t.parentElement;
+    return t;
   }
 
   function openProjectSlug(slug) {
@@ -424,7 +434,8 @@ function renderIndex(projects) {
   }
 
   tbody.addEventListener('click', (e) => {
-    const btn = e.target?.closest?.('.fav-btn');
+    const target = eventTargetElement(e);
+    const btn = target?.closest?.('.fav-btn');
     if (!btn) return;
     const row = btn.closest('tr');
     const slug = row?.getAttribute('data-slug') || '';
@@ -438,8 +449,10 @@ function renderIndex(projects) {
   // Row click navigation (event delegation for consistent behavior across browsers/devices)
   tbody.addEventListener('click', (e) => {
     if (e.defaultPrevented) return;
-    if (isInteractiveTarget(e.target)) return;
-    const row = e.target?.closest?.('tr[data-slug]');
+    const target = eventTargetElement(e);
+    if (!target) return;
+    if (isInteractiveTarget(target)) return;
+    const row = target.closest?.('tr[data-slug]');
     const slug = row?.getAttribute?.('data-slug') || '';
     openProjectSlug(slug);
   });
@@ -448,9 +461,10 @@ function renderIndex(projects) {
   tbody.addEventListener('keydown', (e) => {
     const key = e.key;
     if (key !== 'Enter' && key !== ' ') return;
-    const row = e.target?.closest?.('tr[data-slug]');
+    const target = eventTargetElement(e);
+    const row = target?.closest?.('tr[data-slug]');
     if (!row) return;
-    if (isInteractiveTarget(e.target)) return;
+    if (target && isInteractiveTarget(target)) return;
     e.preventDefault();
     const slug = row.getAttribute('data-slug') || '';
     openProjectSlug(slug);
