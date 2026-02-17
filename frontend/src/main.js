@@ -215,9 +215,14 @@ function saveFavs(map) {
 }
 
 function renderIndex(projects) {
+  const buildVersion = (typeof __SPCARD_BUILD__ !== 'undefined') ? String(__SPCARD_BUILD__ || '') : '';
+
   const root = el('div', { class: 'page' }, [
     el('header', { class: 'topbar' }, [
-      el('div', { class: 'brand', text: 'Certificate Preview' }),
+      el('div', { class: 'brand' }, [
+        el('span', { text: 'Certificate Preview' }),
+        buildVersion ? el('span', { class: 'brand-version', text: `(${buildVersion})` }) : null,
+      ].filter(Boolean)),
       el('div', { class: 'actions' }, [
         el('a', {
           class: 'btn',
