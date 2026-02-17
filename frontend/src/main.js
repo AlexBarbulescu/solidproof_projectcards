@@ -345,15 +345,6 @@ function renderIndex(projects) {
         const blockchains = Array.isArray(p?.blockchains) ? p.blockchains : [];
         const searchBlob = getSearchBlob(p);
 
-        function openProject() {
-          setView({ view: 'preview', project: slug });
-        }
-
-        function isInteractiveTarget(target) {
-          if (!target || typeof target.closest !== 'function') return false;
-          return !!target.closest('a,button,input,select,textarea,label,[role="button"],[role="link"],.fav-btn');
-        }
-
         const row = el('tr', {
           class: 'project-tr',
           'data-search': searchBlob,
@@ -362,17 +353,6 @@ function renderIndex(projects) {
           tabIndex: 0,
           title: 'Open project',
           'aria-label': `Open ${name}`,
-          onClick: (e) => {
-            if (isInteractiveTarget(e.target)) return;
-            openProject();
-          },
-          onKeyDown: (e) => {
-            const key = e.key;
-            if (key === 'Enter' || key === ' ') {
-              e.preventDefault();
-              openProject();
-            }
-          }
         }, [
           el('td', { class: 'col-fav' }, [
             el('button', { class: 'fav-btn', type: 'button', 'aria-label': 'Toggle favorite', title: 'Favorite' }, [
@@ -433,6 +413,16 @@ function renderIndex(projects) {
     );
   }
 
+  function isInteractiveTarget(target) {
+    if (!target || typeof target.closest !== 'function') return false;
+    return !!target.closest('a,button,input,select,textarea,label,[role="button"],[role="link"],.fav-btn');
+  }
+
+  function openProjectSlug(slug) {
+    if (!slug) return;
+    setView({ view: 'preview', project: slug });
+  }
+
   tbody.addEventListener('click', (e) => {
     const btn = e.target?.closest?.('.fav-btn');
     if (!btn) return;
@@ -443,6 +433,27 @@ function renderIndex(projects) {
     if (!favs[slug]) delete favs[slug];
     saveFavs(favs);
     syncFavUI();
+  });
+
+  // Row click navigation (event delegation for consistent behavior across browsers/devices)
+  tbody.addEventListener('click', (e) => {
+    if (e.defaultPrevented) return;
+    if (isInteractiveTarget(e.target)) return;
+    const row = e.target?.closest?.('tr[data-slug]');
+    const slug = row?.getAttribute?.('data-slug') || '';
+    openProjectSlug(slug);
+  });
+
+  // Keyboard navigation when a row is focused
+  tbody.addEventListener('keydown', (e) => {
+    const key = e.key;
+    if (key !== 'Enter' && key !== ' ') return;
+    const row = e.target?.closest?.('tr[data-slug]');
+    if (!row) return;
+    if (isInteractiveTarget(e.target)) return;
+    e.preventDefault();
+    const slug = row.getAttribute('data-slug') || '';
+    openProjectSlug(slug);
   });
 
   input.addEventListener('input', applyFilter);
