@@ -173,3 +173,42 @@ a:hover{color:var(--accent)}
 .ecosystem.placeholder{display:inline-block;width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.06)}
 
 .category-pill{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-weight:600;font-size:12px}
+
+/* Mobile refinements */
+@media (max-width: 760px){
+  .page{padding:12px}
+  .content{padding:4px 0}
+
+  .topbar{flex-wrap:wrap;align-items:flex-start;gap:10px}
+  .brand{flex-wrap:wrap;row-gap:4px}
+  .actions{width:100%;margin-left:0;justify-content:flex-start;flex-wrap:wrap}
+  .topbar .btn{min-height:42px}
+
+  .card-title{padding:11px 12px}
+  .card-body{padding:11px 12px}
+
+  .title-row{align-items:flex-start;flex-wrap:wrap}
+
+  .searchbar{flex-direction:column;align-items:stretch;gap:8px}
+  .search-actions{width:100%}
+  .search-actions .btn{width:100%;min-height:42px}
+  .search-input{font-size:16px} /* prevent iOS zoom on focus */
+
+  .row{gap:8px}
+  .row .btn{min-height:42px}
+
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .projects-table{min-width:860px}
+  .projects-table thead th,
+  .projects-table tbody td{padding:10px 10px}
+
+  .name-cell{min-width:220px;gap:10px}
+  .project-logo{width:36px;height:36px;border-radius:10px}
+  .project-name{max-width:300px}
+
+  .fav-btn{width:36px;height:36px}
+  .project-tr,
+  .fav-btn,
+  .btn,
+  .icon-link{touch-action:manipulation}
+}
