@@ -124,6 +124,9 @@ a:hover{color:var(--accent)}
 .projects-table tbody td{padding:12px 12px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:middle}
 .projects-table tbody tr:hover{background:rgba(255,255,255,.04)}
 
+.project-tr{cursor:pointer}
+.project-tr:focus-visible{outline:2px solid rgba(103,162,255,.85);outline-offset:-2px}
+
 .col-fav{width:48px}
 .col-id{width:84px}
 .col-score{width:150px}

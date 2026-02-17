@@ -340,7 +340,35 @@ function renderIndex(projects) {
         const blockchains = Array.isArray(p?.blockchains) ? p.blockchains : [];
         const searchBlob = getSearchBlob(p);
 
-        const row = el('tr', { class: 'project-tr', 'data-search': searchBlob, 'data-slug': slug }, [
+        function openProject() {
+          setView({ view: 'preview', project: slug });
+        }
+
+        function isInteractiveTarget(target) {
+          if (!target || typeof target.closest !== 'function') return false;
+          return !!target.closest('a,button,input,select,textarea,label,[role="button"],[role="link"],.fav-btn');
+        }
+
+        const row = el('tr', {
+          class: 'project-tr',
+          'data-search': searchBlob,
+          'data-slug': slug,
+          role: 'link',
+          tabIndex: 0,
+          title: 'Open project',
+          'aria-label': `Open ${name}`,
+          onClick: (e) => {
+            if (isInteractiveTarget(e.target)) return;
+            openProject();
+          },
+          onKeyDown: (e) => {
+            const key = e.key;
+            if (key === 'Enter' || key === ' ') {
+              e.preventDefault();
+              openProject();
+            }
+          }
+        }, [
           el('td', { class: 'col-fav' }, [
             el('button', { class: 'fav-btn', type: 'button', 'aria-label': 'Toggle favorite', title: 'Favorite' }, [
               el('span', { class: 'fav-icon', 'aria-hidden': 'true', text: '☆' })
